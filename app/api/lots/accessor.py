@@ -1,9 +1,10 @@
+from sqlalchemy.dialects.postgresql import insert
 from sqlmodel import col, func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.models.depots import Depot
 from core.models.fuels import Fuel
-from core.models.lots import Lot
+from core.models.lots import Lot, LotCreate
 from core.store import Store
 
 
@@ -47,5 +48,12 @@ class LotsAccessor:
         return await session.scalar(stmt)
 
     @staticmethod
-    async def create_lot(lot: Lot, session: AsyncSession) -> Lot:
-        pass
+    async def create_lots(lots: list[LotCreate], session: AsyncSession) -> Lot | None:
+        stmt = (
+            insert(Lot)
+            .values(
+                [lot.model_dump() for lot in lots],
+            )
+            .returning(Lot)
+        )
+        return await session.scalar(stmt)

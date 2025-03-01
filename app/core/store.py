@@ -21,12 +21,14 @@ class Store:
         from api.depots.accessor import DepotsAccessor
         from api.lots.accessor import LotsAccessor
         from api.orders.accessor import OrderAccessor
+        from core.accessor import CoreAccessor
 
         self.user_accessor = UserAccessor(self)
 
         self.order_accessor = OrderAccessor(self)
         self.lot_accessor = LotsAccessor(self)
-        self.depons_accessor = DepotsAccessor(self)
+        self.depots_accessor = DepotsAccessor(self)
+        self.core_accessor = CoreAccessor(self)
 
         from api.auth.manager import UserManager
         from api.lots.manager import LotManager

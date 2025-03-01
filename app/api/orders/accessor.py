@@ -3,6 +3,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import col, exists, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from api.orders.filters import OrderFilterParams
 from core.models.lots import Lot
 from core.models.orders import Order, OrderCreate, OrderPublic
 from core.models.user import User
@@ -13,48 +14,47 @@ class OrderAccessor:
     def __init__(self, store: Store) -> None:
         self.store = store
 
-    @staticmethod
-    async def get_all_orders(
+    async def get_orders(
+        self,
         *,
+        filter_query: OrderFilterParams,
         user: User,
         session: AsyncSession,
-        offset: int = 0,
-        page: int = 10,
-        fuel_type: str | None = None,
-        depot: str | None = None,
-        region: str | None = None,
-        status: str | None = None,
-        user_id: str | None = None,
     ) -> list[Order]:
-        stmt = select(Order).join(Lot, Order.lot_id == Lot.id)
+        mapping = {
+            "fuel_type": Order.lot.fuel,
+            "depot": Order.lot.depot,
+            "region": Order.lot.depot.region,
+            "status": Order.status,
+        }
+
+        conditions = [
+            self.store.core_accessor.make_condition(getattr(filter_query, key), column)
+            for key, column in mapping.items()
+        ]
+        conditions = [cond for cond in conditions if cond]
 
         if not user.is_admin:
-            stmt = stmt.where(Order.user_id == user.id)
-
-        if fuel_type:
-            stmt = stmt.where(Order.lot.fuel == fuel_type)
-        if depot:
-            stmt = stmt.where(Order.lot.depot == depot)
-        if region:
-            stmt = stmt.where(Order.lot.depot.region == region)
-        if status:
-            stmt = stmt.where(Order.status == status)
-        if user_id and user.is_admin:
-            stmt = stmt.where(Order.user_id == user_id)
+            conditions.append(Order.user_id == user.id)
+        elif getattr(filter_query, "user_id", None):
+            conditions.append(Order.user_id == filter_query.user_id)
 
         stmt = (
-            stmt.options(selectinload(Order.lot))
-            .offset((page - 1) * offset)
-            .limit(offset)
+            select(Order)
+            .join(Lot, Order.lot_id == Lot.id)
+            .options(selectinload(Order.lot))
+            .where(*conditions)
+            .offset((filter_query.page - 1) * filter_query.offset)
+            .limit(filter_query.offset)
         )
-
         return (await session.scalars(stmt)).all()
 
     @staticmethod
     async def get_order_by_id(
+        *,
+        order_id: int,
         user: User,
         session: AsyncSession,
-        order_id: int,
     ) -> bool | None:
         stmt = select(
             exists().where(col(OrderPublic.id) == order_id)
@@ -71,10 +71,7 @@ class OrderAccessor:
     ) -> Order:
         stmt = (
             insert(Order)
-            .values(
-                **order_in.model_dump(),
-                user_id=user_id,
-            )
+            .values(**order_in.model_dump(), user_id=user_id)
             .returning(Order)
         )
         return await session.scalar(stmt)

@@ -1,8 +1,11 @@
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter
 
-from api.auth.depends import AdminDep, SessionDep, UserDep
-from core.models.depots import Depot, DepotBase, DepotNamePublic, DepotPublic, DepotRegionPublic
-from core.models.lots import LotDetail, LotPublic, LotWithPages
+from api.auth.depends import AdminDep, SessionDep
+from core.models.depots import (
+    DepotNamePublic,
+    DepotPublic,
+    DepotRegionPublic,
+)
 from core.store import store
 
 router = APIRouter(prefix="/depots", tags=["Depots"])
@@ -45,10 +48,10 @@ async def get_depots_regions(
 )
 async def depot_create(
     _user: AdminDep,
-    depot_in: DepotBase,
+    depot_in: DepotPublic,
     session: SessionDep,
-) -> DepotPublic:
-    return store.depons_accessor.create_depot(
+) -> None:
+    return await store.depons_accessor.create_depot(
         session=session,
         depot_in=depot_in,
     )

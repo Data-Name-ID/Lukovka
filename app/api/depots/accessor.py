@@ -1,13 +1,9 @@
-from typing import Any
-
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.orm import load_only, selectinload
-from sqlmodel import func, select, true
+from sqlalchemy.orm import load_only
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from core.models.depots import Depot, DepotBase
-from core.models.fuels import Fuel
-from core.models.lots import Lot
+from core.models.depots import Depot, DepotPublic
 from core.store import Store
 
 
@@ -36,12 +32,13 @@ class DepotsAccessor:
     @staticmethod
     async def create_depot(
         *,
-        depot_in: DepotBase,
+        depot_in: DepotPublic,
         session: AsyncSession,
     ) -> Depot:
-        stmt = insert(Depot).values(depot_in).returning(Depot)
-
-        return await session.exec(stmt)
+        stmt = insert(Depot).values(**depot_in.model_dump()).returning(Depot)
+        await session.scalar(stmt)
+        await session.commit()
+        return None
 
     # @staticmethod
     # async def get_lot_by_id(lot_id: int, session: AsyncSession) -> Lot | None:

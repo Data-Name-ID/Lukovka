@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from pydantic import BaseModel
 from sqlmodel import BigInteger, Column, Field, Relationship
 
 from core.db import BaseSQLModel
@@ -26,3 +27,13 @@ class Depot(DepotBase, table=True):
 
 class DepotPublic(DepotBase):
     id: int
+
+
+class DepotNamePublic(BaseModel):
+    id: int
+    name: str
+
+
+class DepotRegionPublic(BaseModel):
+    id: int
+    region: str

@@ -23,14 +23,22 @@ class OrderAccessor:
         fuel_type: str | None = None,
         depot: str | None = None,
         region: str | None = None,
+        status: str | None = None,
+        user_id: str | None = None,
     ) -> bool | None:
         stmt = (
             select(OrderPublic)
             .where(
                 (user.is_admin | OrderPublic.user.id == user.id)
-                & (OrderPublic.fuel == fuel_type if fuel_type else True)
-                & (OrderPublic.depot == depot if depot else True)
-                & (OrderPublic.region == region if region else True),
+                & (OrderPublic.lot.fuel == fuel_type if fuel_type else True)
+                & (OrderPublic.lot.depot == depot if depot else True)
+                & (OrderPublic.lot.region == region if region else True)
+                & (OrderPublic.status == status if status else True)
+                & (
+                    OrderPublic.user.id == user_id
+                    if user_id and user.is_admin
+                    else True
+                ),
             )
             .offset((page - 1) * offset)
             .limit(offset)

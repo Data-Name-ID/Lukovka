@@ -27,6 +27,8 @@ async def get_orders(
     fuel_type: str | None = None,
     depot: str | None = None,
     region: str | None = None,
+    status: str | None = None,
+    user_id: int | None = None,
 ):
     return await store.order_accessor.get_all_orders(
         user=user,
@@ -36,6 +38,8 @@ async def get_orders(
         fuel_type=fuel_type,
         depot=depot,
         region=region,
+        status=status,
+        user_id=user_id,
     )
 
 

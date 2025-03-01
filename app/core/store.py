@@ -12,9 +12,11 @@ class Store:
 
         from api.auth.accessor import UserAccessor
         from core.db import DatabaseAccessor
+        from api.orders.accessor import OrderAccessor
 
         self.db = DatabaseAccessor(self)
         self.user_accessor = UserAccessor(self)
+        self.order_accessor = OrderAccessor(self)
 
         from api.auth.manager import UserManager
 

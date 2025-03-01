@@ -3,8 +3,9 @@ from fastapi.responses import RedirectResponse
 from starlette import status
 
 from api.auth import errors
+from api.orders import manager
 from api.auth.depends import SessionDep, UserDep
-from app.core.models.orders import OrderCreate
+from core.models.orders import OrderCreate, OrderId
 from core.models.jwt import AccessToken, RefreshToken, TokenCollection
 from core.models.user import UserCreate, UserLogin, UserPublic
 from core.schemas import DetailScheme
@@ -61,14 +62,12 @@ async def order_create(
     user: UserDep,
     order_in: OrderCreate,
     request: Request,
-    background_tasks: BackgroundTasks,
     session: SessionDep,
-) -> int:
-    order_id = await store.order_accessor.create_order(
+) -> OrderId:
+    order_id = manager.process_creating_order(
         session=session,
-        user_id=user.id,
-        order_in=order_in,
+        lot_id=order_in.lot_id,
+        request_quantity=order_in.volume,
     )
-    await session.commit()
 
-    return order_id
+    return OrderId(order_id=order_id)

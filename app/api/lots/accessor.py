@@ -38,6 +38,6 @@ class LotsAccessor:
         return page_count, [elem[0] for elem in results]
 
     @staticmethod
-    async def get_lot_by_id(lot_id: int, session: AsyncSession) -> Lot:
+    async def get_lot_by_id(lot_id: int, session: AsyncSession) -> Lot | None:
         stmt = select(Lot).where(Lot.id == lot_id)
         return await session.scalar(stmt)

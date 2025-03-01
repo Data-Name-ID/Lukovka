@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import StrEnum
 
+from pydantic import BaseModel
 from sqlmodel import TIMESTAMP, BigInteger, Column, Enum, Field, text
 
 from core.db import BaseSQLModel
@@ -18,6 +19,10 @@ class OrderStatusEnum(StrEnum):
     IN_PROGRESS = "В процессе"
     COMPLETED = "Выполнен"
     CANCELED = "Отменён"
+
+
+class OrderId(BaseModel):
+    order_id: int
 
 
 class OrderBase(BaseSQLModel):

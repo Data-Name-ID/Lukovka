@@ -45,8 +45,7 @@ class OrderAccessor:
         user_id: int,
         order_in: OrderCreate,
         session: AsyncSession,
-    ) -> int:
-        stmt = select()
+    ) -> Order:
         stmt = (
             insert(Order)
             .values(

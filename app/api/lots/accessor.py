@@ -1,4 +1,4 @@
-from sqlmodel import select
+from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.models.lots import Lot
@@ -18,9 +18,12 @@ class LotsAccessor:
         fuel_type: str | None = None,
         depot: str | None = None,
         region: str | None = None,
-) -> list[Lot]:
+) -> tuple[int, list[Lot]]:
         stmt = (
-            select(Lot)
+            select(
+                Lot,
+                func.count().over().label("total_count"),
+            )
             .where(
                 (Lot.fuel == fuel_type if fuel_type else True) &
                 (Lot.depot == depot if depot else True) &
@@ -29,12 +32,15 @@ class LotsAccessor:
             .offset((page - 1) * offset)
             .limit(offset)
         )
-        return list((await session.scalars(stmt)).all())
+        results = (await session.scalars(stmt)).all()
+        lots_count = results[0][1] if results else 0
+        page_count = (lots_count + offset - 1) // offset
+        return page_count, [elem[0] for elem in results]
 
-    @staticmethod
-    async def get_lots_by_id(
-        session: AsyncSession,
-        lot_id: int,
-    ) -> Lot:
-        stmt = ...
-        return await session.scalar(stmt)
+    # @staticmethod
+    # async def get_lots_by_id(
+    #     session: AsyncSession,
+    #     lot_id: int,
+    # ) -> Lot:
+    #     stmt = ...
+    #     return await session.scalar(stmt)

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/lots", tags=["Lots"])
     response_description="Лоты",
 )
 async def get_lots(
-    _user: UserDep,
+    # _user: UserDep,
     session: SessionDep,
     page: int | None = 1,
     offset: int | None = 10,
@@ -21,7 +21,7 @@ async def get_lots(
     depot: str | None = None,
     region: str | None = None,
 ) -> LotWithPages:
-    res = await store.lots_accessor.get_all_lots(
+    page_count, lots = await store.lots_accessor.get_all_lots(
         page=page,
         offset=offset,
         fuel_type=fuel_type,
@@ -30,8 +30,8 @@ async def get_lots(
         session=session,
     )
     return LotWithPages(
-        page_count=10,
-        lots=res,
+        page_count=page_count,
+        lots=lots,
     )
 
 

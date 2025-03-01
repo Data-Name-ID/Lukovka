@@ -1,7 +1,10 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Query
 from starlette import status
 
 from api.auth.depends import SessionDep, UserDep
+from api.orders.filters import OrderFilterParams
 from core.models.orders import OrderCreate, OrderPublic
 from core.models.user import UserPublic
 from core.schemas import DetailScheme
@@ -16,26 +19,14 @@ router = APIRouter(prefix="/orders", tags=["Заказы"])
     response_description="Заказы пользователя",
 )
 async def get_orders(
+    filter_query: Annotated[OrderFilterParams, Query()],
     user: UserDep,
     session: SessionDep,
-    offset: int = 1,
-    page: int = 10,
-    fuel_type: str | None = None,
-    depot: str | None = None,
-    region: str | None = None,
-    status: str | None = None,
-    user_id: int | None = None,
 ) -> list[OrderPublic]:
-    return await store.order_accessor.get_all_orders(
+    return await store.order_accessor.get_orders(
+        filter_query=filter_query,
         user=user,
         session=session,
-        offset=offset,
-        page=page,
-        fuel_type=fuel_type,
-        depot=depot,
-        region=region,
-        status=status,
-        user_id=user_id,
     )
 
 
@@ -51,8 +42,8 @@ async def get_orders(
     },
 )
 async def get_order_by_id(
-    user: UserDep,
     order_id: int,
+    user: UserDep,
     session: SessionDep,
 ) -> UserPublic:
     return store.order_accessor.get_order_by_id(
@@ -68,13 +59,12 @@ async def get_order_by_id(
     response_description="Создание заказа",
 )
 async def order_create(
-    user: UserDep,
     order_in: OrderCreate,
+    user: UserDep,
     session: SessionDep,
 ) -> OrderPublic:
-    return store.order_manager.process_creating_order(
+    return await store.order_manager.process_creating_order(
         session=session,
         user_id=user.id,
-        lot_id=order_in.lot_id,
-        request_quantity=order_in.volume,
+        order_in=order_in,
     )

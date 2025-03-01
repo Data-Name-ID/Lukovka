@@ -23,6 +23,7 @@ class LotManager:
 
         text_stream = io.TextIOWrapper(csv_file, encoding="utf-8")
         reader = DictReader(text_stream)
+
         for row in reader:
             if not all(val.strip() for val in row.values()):
                 continue

@@ -1,17 +1,14 @@
-from fastapi import APIRouter, UploadFile
+from typing import Annotated
 
-from api.auth.depends import SessionDep, UserDep
+from fastapi import APIRouter, Query, UploadFile
+
+from api.auth.depends import AdminDep, SessionDep, UserDep
+from api.lots import errors
+from api.lots.filters import LotFilterParams
 from core.models.lots import LotDetail, LotPublic, LotWithPages
 from core.store import store
 
 router = APIRouter(prefix="/lots", tags=["Lots"])
-
-
-@router.post("/upload")
-async def create_upload_file(csv_file: UploadFile, session: SessionDep) -> int:
-    return await store.lot_manager.create_lots_from_csv(
-        csv_file=csv_file.file, session=session,
-    )
 
 
 @router.get(
@@ -20,20 +17,13 @@ async def create_upload_file(csv_file: UploadFile, session: SessionDep) -> int:
     response_description="Лоты",
 )
 async def get_lots(
-    # _user: UserDep,
+    filter_query: Annotated[LotFilterParams, Query()],
+    user: UserDep,
     session: SessionDep,
-    page: int = 1,
-    offset: int = 10,
-    fuel: str | None = None,
-    depot: str | None = None,
-    region: str | None = None,
 ) -> LotWithPages:
-    page_count, lots = await store.lot_accessor.get_all_lots(
-        page=page,
-        offset=offset,
-        fuel=fuel,
-        depot=depot,
-        region=region,
+    page_count, lots = await store.lot_accessor.get_lots(
+        filter_query=filter_query,
+        user=user,
         session=session,
     )
     return LotWithPages(
@@ -70,3 +60,18 @@ async def get_lots_by_id(
         fuel=lot.fuel.name,
         region=lot.depot.region,
     )
+
+
+@router.post("/upload")
+async def create_upload_file(
+    csv_file: UploadFile,
+    _user: AdminDep,
+    session: SessionDep,
+) -> int:
+    try:
+        return await store.lot_manager.create_lots_from_csv(
+            csv_file=csv_file.file,
+            session=session,
+        )
+    except Exception as e:
+        raise errors.INVALID_FILE_ERROR from e

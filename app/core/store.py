@@ -1,5 +1,6 @@
 import logging
 
+
 class Store:
     def __init__(self) -> None:
         from core.config import Config
@@ -19,11 +20,13 @@ class Store:
         from api.auth.accessor import UserAccessor
         from api.lots.accessor import LotsAccessor
         from api.orders.accessor import OrderAccessor
+        from core.accessor import CoreAccessor
 
         self.user_accessor = UserAccessor(self)
 
         self.order_accessor = OrderAccessor(self)
         self.lot_accessor = LotsAccessor(self)
+        self.core_accessor = CoreAccessor(self)
 
         from api.auth.manager import UserManager
         from api.lots.manager import LotManager

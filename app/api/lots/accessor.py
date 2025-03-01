@@ -2,12 +2,14 @@ from typing import Any
 
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import selectinload
-from sqlmodel import func, select, true
+from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from api.lots.filters import LotFilterParams
 from core.models.depots import Depot
 from core.models.fuels import Fuel
-from core.models.lots import Lot
+from core.models.lots import Lot, LotStatusEnum
+from core.models.user import User
 from core.store import Store
 
 
@@ -15,44 +17,53 @@ class LotsAccessor:
     def __init__(self, store: Store) -> None:
         self.store = store
 
-    @staticmethod
-    async def get_all_lots(
+    async def get_lots(
+        self,
         *,
+        filter_query: LotFilterParams,
+        user: User,
         session: AsyncSession,
-        page: int = 1,
-        offset: int = 10,
-        fuel: str | None = None,
-        depot: str | None = None,
-        region: str | None = None,
     ) -> tuple[int, list[Lot]]:
-        data_stmt = (
-            select(Lot)
+        mapping = {
+            "fuel": Fuel.name,
+            "depot": Depot.name,
+            "region": Depot.region,
+        }
+
+        conditions = [
+            self.store.core_accessor.make_condition(getattr(filter_query, key), column)
+            for key, column in mapping.items()
+        ]
+        conditions = [cond for cond in conditions if cond is not None]
+
+        if not user.is_admin:
+            conditions.append(Lot.status == LotStatusEnum.CONFIRMED.value)
+
+        query = (
+            select(Lot, func.count(Lot.id).over().label("total_count"))
             .join(Fuel, Fuel.id == Lot.fuel_id)
             .join(Depot, Depot.id == Lot.depot_id)
             .options(selectinload(Lot.fuel), selectinload(Lot.depot))
-            .where(
-                (Fuel.name == fuel if fuel else true()),
-                (Depot.name == depot if depot else true()),
-                (Depot.region == region if region else true()),
-            )
-            .offset((page - 1) * offset)
-            .limit(offset)
+            .where(*conditions)
+            .offset((filter_query.page - 1) * filter_query.offset)
+            .limit(filter_query.offset)
         )
 
-        count_stmt = (
-            select(func.count(Lot.id))
-            .join(Fuel, Fuel.id == Lot.fuel_id)
-            .join(Depot, Depot.id == Lot.depot_id)
-            .where(
-                (Fuel.name == fuel if fuel else true()),
-                (Depot.name == depot if depot else true()),
-                (Depot.region == region if region else true()),
-            )
-        )
-        total_count = await session.scalar(count_stmt)
+        result = await session.execute(query)
+        rows = result.all()
 
-        data = (await session.scalars(data_stmt)).all()
-        page_count = (total_count + offset - 1) // offset
+        if rows:
+            total_count = rows[0][1]
+            data = [row[0] for row in rows]
+        else:
+            total_count = 0
+            data = []
+
+        page_count = (
+            (total_count + filter_query.offset - 1) // filter_query.offset
+            if filter_query.offset
+            else 0
+        )
         return page_count, data
 
     @staticmethod
@@ -70,4 +81,5 @@ class LotsAccessor:
         session: AsyncSession,
     ) -> Lot | None:
         stmt = insert(Lot).values(lots).returning(Lot)
-        return await session.exec(stmt)
+        await session.exec(stmt)
+        await session.commit()

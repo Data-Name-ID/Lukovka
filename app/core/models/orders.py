@@ -1,11 +1,12 @@
 from datetime import datetime
 from enum import StrEnum
 
-from sqlmodel import TIMESTAMP, BigInteger, Column, Enum, Field, text
+from pydantic import BaseModel
+from sqlmodel import TIMESTAMP, BigInteger, Column, Enum, Field, Relationship, text
 
 from core.db import BaseSQLModel
-from core.models.lots import LotPublic
-from core.models.user import UserPublic
+from core.models.lots import Lot, LotPublic
+from core.models.user import User, UserPublic
 
 
 class DeliveryTypeEnum(StrEnum):
@@ -18,6 +19,10 @@ class OrderStatusEnum(StrEnum):
     IN_PROGRESS = "В процессе"
     COMPLETED = "Выполнен"
     CANCELED = "Отменён"
+
+
+class OrderId(BaseModel):
+    order_id: int
 
 
 class OrderBase(BaseSQLModel):
@@ -63,6 +68,9 @@ class Order(OrderCreate, OrderFields, table=True):
     )
 
     user_id: int | None = Field(default=None, foreign_key="users.id")
+
+    lot: Lot = Relationship(back_populates="orders")
+    user: User = Relationship(back_populates="orders")
 
 
 class OrderPublic(OrderBase, OrderFields):

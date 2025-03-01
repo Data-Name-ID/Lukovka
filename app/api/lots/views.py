@@ -2,22 +2,14 @@ from fastapi import APIRouter, UploadFile
 
 from api.auth.depends import SessionDep, UserDep
 from core.models.lots import LotDetail, LotPublic, LotWithPages
-from core.schemas import MessageScheme
 from core.store import store
 
 router = APIRouter(prefix="/lots", tags=["Lots"])
 
 
 @router.post("/upload")
-async def create_upload_file(
-    csv_file: UploadFile,
-    session: SessionDep,
-) -> MessageScheme:
-    await store.lot_manager.create_lots_from_csv(
-        csv_file=csv_file.file,
-        session=session,
-    )
-    return {"message": "ok"}
+async def create_upload_file(csv_file: UploadFile, session: SessionDep):
+    return await store.lot_manager.create_lots_from_csv(csv_file=csv_file.file, session=session)
 
 
 @router.get(

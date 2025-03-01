@@ -4,6 +4,7 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from api.auth import errors
 from core.models.user import User
 from core.store import store
 
@@ -21,3 +22,13 @@ async def user_dependency(token: TokenDep, session: SessionDep) -> User:
 
 
 UserDep = Annotated[User, Depends(user_dependency)]
+
+
+def admin_dependency(user: UserDep) -> User:
+    if not user.is_admin:
+        raise errors.USER_NOT_ADMIN
+
+    return user
+
+
+AdminDep = Annotated[User, Depends(admin_dependency)]

@@ -1,11 +1,10 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Request
 from starlette import status
 
-from api.auth import errors
 from api.auth.depends import SessionDep, UserDep
-from core.models.jwt import AccessToken, RefreshToken, TokenCollection
-from core.models.user import UserCreate, UserLogin, UserPublic
+from api.orders import manager
+from core.models.orders import OrderCreate, OrderId, OrderPublic
+from core.models.user import UserPublic
 from core.schemas import DetailScheme
 from core.store import store
 
@@ -24,13 +23,20 @@ async def get_orders(
     page: int = 10,
     fuel_type: str | None = None,
     depot: str | None = None,
-):
+    region: str | None = None,
+    status: str | None = None,
+    user_id: int | None = None,
+) -> list[OrderPublic]:
     return await store.order_accessor.get_all_orders(
+        user=user,
         session=session,
         offset=offset,
         page=page,
         fuel_type=fuel_type,
         depot=depot,
+        region=region,
+        status=status,
+        user_id=user_id,
     )
 
 
@@ -46,7 +52,7 @@ async def get_orders(
     },
 )
 async def get_order_by_id(user: UserDep) -> UserPublic:
-    return store.order_accessor.get_order_by_id(user_id=user.id)
+    return store.order_accessor.get_order_by_id(user=user)
 
 
 @router.post(
@@ -55,12 +61,15 @@ async def get_order_by_id(user: UserDep) -> UserPublic:
     response_description="Создание заказа",
 )
 async def order_create(
-    user_in: UserCreate,
+    user: UserDep,
+    order_in: OrderCreate,
     request: Request,
-    background_tasks: BackgroundTasks,
     session: SessionDep,
-) -> None:
-    user_id = await store.order_accessor.create_order(session=session, user_in=user_in)
-    await session.commit()
+) -> OrderId:
+    order_id = manager.process_creating_order(
+        session=session,
+        lot_id=order_in.lot_id,
+        request_quantity=order_in.volume,
+    )
 
-    return None
+    return OrderId(order_id=order_id)

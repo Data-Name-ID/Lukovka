@@ -38,7 +38,7 @@ class UserAccessor:
         stmt = (
             select(User)
             .where(User.id == user_id)
-            .options(load_only(User.id, User.activated, User.email))  # type: ignore[arg-type]
+            .options(load_only(User.id, User.activated, User.email, User.is_admin))  # type: ignore[arg-type]
         )
         return await session.scalar(stmt)
 

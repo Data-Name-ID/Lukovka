@@ -17,3 +17,7 @@ USER_NOT_EXISTS = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail="Пользователя не существует",
 )
+USER_NOT_ADMIN = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail="Недостаточно прав",
+)

@@ -19,6 +19,7 @@ class Store:
         from api.orders.accessor import OrderAccessor
 
         self.user_accessor = UserAccessor(self)
+
         self.order_accessor = OrderAccessor(self)
         self.lot_accessor = LotsAccessor(self)
 

@@ -1,8 +1,13 @@
+from typing import TYPE_CHECKING
+
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
-from sqlmodel import VARCHAR, BigInteger, Column, Field
+from sqlmodel import VARCHAR, BigInteger, Column, Field, Relationship
 
 from core.db import BaseSQLModel
+
+if TYPE_CHECKING:
+    from core.models.orders import Order
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -15,6 +20,7 @@ class UserBase(BaseSQLModel):
 
 class ConfirmMixin(BaseSQLModel):
     activated: bool = False
+    is_admin: bool = False
 
 
 class UserCreate(UserBase):
@@ -35,6 +41,8 @@ class User(UserCreate, ConfirmMixin, table=True):
         default=None,
         sa_column=Column(BigInteger, primary_key=True),
     )
+
+    orders: list["Order"] = Relationship(back_populates="user")
 
 
 class UserPublic(UserBase):

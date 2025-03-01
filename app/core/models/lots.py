@@ -1,7 +1,8 @@
 from datetime import datetime
 from enum import StrEnum
 
-from sqlmodel import BigInteger, Column, Enum, Field
+from pydantic import BaseModel
+from sqlmodel import BigInteger, Column, Enum, Field, Relationship
 
 from core.db import BaseSQLModel
 from core.models.depots import DepotPublic
@@ -41,3 +42,8 @@ class LotPublic(LotBase):
 
     depot: DepotPublic
     fuel: FuelPublic
+
+
+class LotWithPages(BaseModel):
+    page_count: int
+    lots: list[LotPublic]

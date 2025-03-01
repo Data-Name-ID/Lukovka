@@ -15,17 +15,17 @@ class LotStatusEnum(StrEnum):
 
 
 class LotBase(BaseSQLModel):
-    date: datetime
     price: float
-
-
-class LotCreate(LotBase):
-    initial_volume: float
     current_volume: float
 
     status: LotStatusEnum = Field(
         sa_column=Column(Enum(LotStatusEnum, name="lot_status")),
     )
+
+
+class LotCreate(LotBase):
+    initial_volume: float
+    date: datetime
 
     depot_id: int = Field(foreign_key="depots.id")
     fuel_id: int = Field(foreign_key="fuels.id")

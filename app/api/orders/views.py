@@ -29,6 +29,7 @@ async def get_orders(
     region: str | None = None,
 ):
     return await store.order_accessor.get_all_orders(
+        user=user,
         session=session,
         offset=offset,
         page=page,
@@ -50,7 +51,7 @@ async def get_orders(
     },
 )
 async def get_order_by_id(user: UserDep) -> UserPublic:
-    return store.order_accessor.get_order_by_id(user_id=user.id)
+    return store.order_accessor.get_order_by_id(user=user)
 
 
 @router.post(

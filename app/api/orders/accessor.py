@@ -3,7 +3,8 @@ from sqlalchemy.orm import load_only
 from sqlmodel import col, exists, select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.core.models.orders import Order, OrderCreate, OrderPublic
+from api.auth.depends import UserDep
+from core.models.orders import Order, OrderCreate, OrderPublic
 from core.models.user import User, UserCreate
 from core.store import Store
 
@@ -15,6 +16,7 @@ class OrderAccessor:
     @staticmethod
     async def get_all_orders(
         *,
+        user: UserDep,
         session: AsyncSession,
         offset: int = 0,
         page: int = 10,
@@ -25,7 +27,8 @@ class OrderAccessor:
         stmt = (
             select(OrderPublic)
             .where(
-                (OrderPublic.fuel == fuel_type if fuel_type else True)
+                (user.is_admin | OrderPublic.user.id == user.id)
+                & (OrderPublic.fuel == fuel_type if fuel_type else True)
                 & (OrderPublic.depot == depot if depot else True)
                 & (OrderPublic.region == region if region else True),
             )
@@ -35,8 +38,15 @@ class OrderAccessor:
         return await session.scalar(stmt)
 
     @staticmethod
-    async def get_order_by_id(session: AsyncSession, order_id: int) -> bool | None:
-        stmt = select(exists().where(col(User.id) == order_id))
+    async def get_order_by_id(
+        user: UserDep,
+        session: AsyncSession,
+        order_id: int,
+    ) -> bool | None:
+        stmt = select(
+            exists().where(col(OrderPublic.id) == order_id)
+            & (user.is_admin | OrderPublic.user.id == user.id),
+        )
         return await session.scalar(stmt)
 
     @staticmethod

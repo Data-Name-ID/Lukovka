@@ -1,11 +1,11 @@
 from datetime import datetime
 from enum import StrEnum
 
-from sqlmodel import TIMESTAMP, BigInteger, Column, Enum, Field, Relationship, text
+from sqlmodel import TIMESTAMP, BigInteger, Column, Enum, Field, text
 
 from core.db import BaseSQLModel
-from core.models.lots import Lot, LotPublic
-from core.models.user import User, UserPublic
+from core.models.lots import LotPublic
+from core.models.user import UserPublic
 
 
 class DeliveryTypeEnum(StrEnum):
@@ -62,10 +62,7 @@ class Order(OrderCreate, OrderFields, table=True):
         sa_column=Column(BigInteger, primary_key=True),
     )
 
-    lot: Lot | None = Relationship(back_populates="orders")
-
     user_id: int | None = Field(default=None, foreign_key="users.id")
-    user: User | None = Relationship(back_populates="orders")
 
 
 class OrderPublic(OrderBase, OrderFields):

@@ -26,6 +26,13 @@ class OrderBase(BaseSQLModel):
     delivery_type: DeliveryTypeEnum = Field(
         sa_column=Column(Enum(DeliveryTypeEnum, name="delivery_type")),
     )
+
+
+class OrderCreate(OrderBase):
+    lot_id: int | None = Field(default=None, foreign_key="lots.id")
+
+
+class OrderFields(BaseSQLModel):
     status: OrderStatusEnum = Field(
         sa_column=Column(Enum(OrderStatusEnum, name="status")),
     )
@@ -47,7 +54,7 @@ class OrderBase(BaseSQLModel):
     )
 
 
-class Order(OrderBase, table=True):
+class Order(OrderCreate, OrderFields, table=True):
     __tablename__ = "orders"
 
     id: int | None = Field(
@@ -55,14 +62,13 @@ class Order(OrderBase, table=True):
         sa_column=Column(BigInteger, primary_key=True),
     )
 
-    lot_id: int | None = Field(default=None, foreign_key="lots.id")
     lot: Lot | None = Relationship(back_populates="orders")
 
     user_id: int | None = Field(default=None, foreign_key="users.id")
     user: User | None = Relationship(back_populates="orders")
 
 
-class OrderPublic(OrderBase):
+class OrderPublic(OrderBase, OrderFields):
     id: int
 
     lot: LotPublic

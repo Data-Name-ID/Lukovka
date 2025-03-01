@@ -67,7 +67,7 @@ class LotsAccessor:
         stmt = (
             insert(Lot)
             .values(
-                [lot.model_dump() for lot in lots],
+                [{**lot.model_dump()} for lot in lots],
             )
             .returning(Lot)
         )

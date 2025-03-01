@@ -36,7 +36,15 @@ async def get_lots(
     )
     return LotWithPages(
         page_count=page_count,
-        lots=lots,
+        lots=[
+            LotPublic(
+                **lot.model_dump(exclude={"depot", "fuel"}),
+                depot=lot.depot.name,
+                fuel=lot.fuel.name,
+                region=lot.depot.region,
+            )
+            for lot in lots
+        ],
     )
 
 

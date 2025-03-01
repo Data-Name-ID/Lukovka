@@ -2,11 +2,11 @@ from datetime import datetime
 from enum import StrEnum
 
 from pydantic import BaseModel
-from sqlmodel import BigInteger, Column, Enum, Field
+from sqlmodel import BigInteger, Column, Enum, Field, Relationship
 
 from core.db import BaseSQLModel
-from core.models.depots import DepotPublic
-from core.models.fuels import FuelPublic
+from core.models.depots import Depot, DepotPublic
+from core.models.fuels import Fuel, FuelPublic
 
 
 class LotStatusEnum(StrEnum):
@@ -39,12 +39,16 @@ class Lot(LotCreate, table=True):
         sa_column=Column(BigInteger, primary_key=True),
     )
 
+    depot: Depot | None = Relationship(back_populates="lots")
+    fuel: Fuel | None = Relationship(back_populates="lots")
+
 
 class LotPublic(LotBase):
     id: int
 
-    depot: DepotPublic
-    fuel: FuelPublic
+    depot: str
+    fuel: str
+    region: str
 
 
 class LotWithPages(BaseModel):

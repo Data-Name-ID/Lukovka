@@ -18,7 +18,7 @@ class RunConfig(BaseModel):
 
 class DatabaseConfig(BaseModel):
     user: str | None = "postgres"
-    password: str | None = "postgres"
+    password: str | None = "postgres"  # noqa: S105
     host: str = "localhost"
     port: int = 5432
     name: str = "postgres"

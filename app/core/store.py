@@ -27,7 +27,7 @@ class Store:
 
         self.order_accessor = OrderAccessor(self)
         self.lot_accessor = LotsAccessor(self)
-        self.depons_accessor = DepotsAccessor(self)
+        self.depots_accessor = DepotsAccessor(self)
         self.core_accessor = CoreAccessor(self)
 
         from api.auth.manager import UserManager

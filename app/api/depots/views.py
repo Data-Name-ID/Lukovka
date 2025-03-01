@@ -20,10 +20,9 @@ async def get_depots_names(
     _user: UserDep,
     session: SessionDep,
 ) -> list[DepotNamePublic]:
-    depots = await store.depons_accessor.get_depots_names(
+    return await store.depots_accessor.get_depots_names(
         session=session,
     )
-    return depots
 
 
 @router.get(
@@ -35,10 +34,9 @@ async def get_depots_regions(
     _user: UserDep,
     session: SessionDep,
 ) -> list[DepotRegionPublic]:
-    depots = await store.depons_accessor.get_depots_regions(
+    return await store.depots_accessor.get_depots_regions(
         session=session,
     )
-    return depots
 
 
 @router.post(
@@ -51,29 +49,7 @@ async def depot_create(
     depot_in: DepotPublic,
     session: SessionDep,
 ) -> None:
-    return await store.depons_accessor.create_depot(
+    return await store.depots_accessor.create_depot(
         session=session,
         depot_in=depot_in,
     )
-
-
-# @router.get(
-#     "/{lot_id}",
-#     summary="Лот по ID",
-#     response_description="Лот",
-# )
-# async def get_lots_by_id(
-#     _user: UserDep,
-#     session: SessionDep,
-#     lot_id: int,
-# ) -> LotDetail | None:
-#     lot = await store.lot_accessor.get_lot_by_id(
-#         session=session,
-#         lot_id=lot_id,
-#     )
-#     return LotDetail(
-#         **lot.model_dump(exclude={"depot", "fuel"}),
-#         depot=lot.depot.name,
-#         fuel=lot.fuel.name,
-#         region=lot.depot.region,
-#     )

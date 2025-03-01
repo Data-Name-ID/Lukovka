@@ -8,8 +8,10 @@ router = APIRouter(prefix="/lots", tags=["Lots"])
 
 
 @router.post("/upload")
-async def create_upload_file(csv_file: UploadFile):
-    return await store.lot_manager.create_lots_from_csv(csv_file=csv_file.file)
+async def create_upload_file(csv_file: UploadFile, session: SessionDep) -> int:
+    return await store.lot_manager.create_lots_from_csv(
+        csv_file=csv_file.file, session=session,
+    )
 
 
 @router.get(

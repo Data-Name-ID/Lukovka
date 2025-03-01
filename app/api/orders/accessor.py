@@ -1,8 +1,9 @@
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.orm import load_only
-from sqlmodel import col, exists, select, update, true
+from sqlalchemy.orm import selectinload
+from sqlmodel import col, exists, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from core.models.lots import Lot
 from core.models.orders import Order, OrderCreate, OrderPublic
 from core.models.user import User
 from core.store import Store
@@ -24,25 +25,30 @@ class OrderAccessor:
         region: str | None = None,
         status: str | None = None,
         user_id: str | None = None,
-    ) -> bool | None:
+    ) -> list[Order]:
+        stmt = select(Order).join(Lot, Order.lot_id == Lot.id)
+
+        if not user.is_admin:
+            stmt = stmt.where(Order.user_id == user.id)
+
+        if fuel_type:
+            stmt = stmt.where(Order.lot.fuel == fuel_type)
+        if depot:
+            stmt = stmt.where(Order.lot.depot == depot)
+        if region:
+            stmt = stmt.where(Order.lot.depot.region == region)
+        if status:
+            stmt = stmt.where(Order.status == status)
+        if user_id and user.is_admin:
+            stmt = stmt.where(Order.user_id == user_id)
+
         stmt = (
-            select(OrderPublic)
-            .where(
-                (user.is_admin | OrderPublic.user.id == user.id)
-                & (OrderPublic.lot.fuel == fuel_type if fuel_type else true())
-                & (OrderPublic.lot.depot == depot if depot else true())
-                & (OrderPublic.lot.region == region if region else true())
-                & (OrderPublic.status == status if status else true())
-                & (
-                    OrderPublic.user.id == user_id
-                    if user_id and user.is_admin
-                    else True
-                ),
-            )
+            stmt.options(selectinload(Order.lot))
             .offset((page - 1) * offset)
             .limit(offset)
         )
-        return await session.scalar(stmt)
+
+        return (await session.scalars(stmt)).all()
 
     @staticmethod
     async def get_order_by_id(

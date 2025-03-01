@@ -1,3 +1,5 @@
+import logging
+
 class Store:
     def __init__(self) -> None:
         from core.config import Config
@@ -25,9 +27,13 @@ class Store:
 
         from api.auth.manager import UserManager
         from api.lots.manager import LotManager
+        from api.orders.manager import OrderManager
 
         self.user_manager = UserManager(self)
         self.lot_manager = LotManager(self)
+        self.order_manager = OrderManager(self)
+
+        self.logger = logging.getLogger("lukovka")
 
 
 store = Store()

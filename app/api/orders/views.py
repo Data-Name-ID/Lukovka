@@ -1,13 +1,9 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter
 from starlette import status
 
-from api.auth import errors
-from api.orders import manager
 from api.auth.depends import SessionDep, UserDep
-from core.models.orders import OrderCreate, OrderId
-from core.models.jwt import AccessToken, RefreshToken, TokenCollection
-from core.models.user import UserCreate, UserLogin, UserPublic
+from core.models.orders import OrderCreate, OrderPublic
+from core.models.user import UserPublic
 from core.schemas import DetailScheme
 from core.store import store
 
@@ -29,7 +25,7 @@ async def get_orders(
     region: str | None = None,
     status: str | None = None,
     user_id: int | None = None,
-):
+) -> list[OrderPublic]:
     return await store.order_accessor.get_all_orders(
         user=user,
         session=session,
@@ -54,8 +50,16 @@ async def get_orders(
         },
     },
 )
-async def get_order_by_id(user: UserDep) -> UserPublic:
-    return store.order_accessor.get_order_by_id(user=user)
+async def get_order_by_id(
+    user: UserDep,
+    order_id: int,
+    session: SessionDep,
+) -> UserPublic:
+    return store.order_accessor.get_order_by_id(
+        user=user,
+        order_id=order_id,
+        session=session,
+    )
 
 
 @router.post(
@@ -66,13 +70,11 @@ async def get_order_by_id(user: UserDep) -> UserPublic:
 async def order_create(
     user: UserDep,
     order_in: OrderCreate,
-    request: Request,
     session: SessionDep,
-) -> OrderId:
-    order_id = manager.process_creating_order(
+) -> OrderPublic:
+    return store.order_manager.process_creating_order(
         session=session,
+        user_id=user.id,
         lot_id=order_in.lot_id,
         request_quantity=order_in.volume,
     )
-
-    return OrderId(order_id=order_id)

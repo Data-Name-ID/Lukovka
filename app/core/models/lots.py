@@ -1,12 +1,16 @@
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 from sqlmodel import BigInteger, Column, Enum, Field, Relationship
 
 from core.db import BaseSQLModel
-from core.models.depots import Depot, DepotPublic
-from core.models.fuels import Fuel, FuelPublic
+from core.models.depots import Depot
+from core.models.fuels import Fuel
+
+if TYPE_CHECKING:
+    from core.models.orders import Order
 
 
 class LotStatusEnum(StrEnum):
@@ -41,6 +45,8 @@ class Lot(LotCreate, table=True):
 
     depot: Depot | None = Relationship(back_populates="lots")
     fuel: Fuel | None = Relationship(back_populates="lots")
+
+    orders: list["Order"] = Relationship(back_populates="lot")
 
 
 class LotPublic(LotBase):

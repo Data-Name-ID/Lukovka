@@ -1,9 +1,13 @@
+from typing import TYPE_CHECKING
+
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
-from sqlmodel import VARCHAR, Column, Field
+from sqlmodel import VARCHAR, BigInteger, Column, Field, Relationship
 
 from core.db import BaseSQLModel
-from core.models.mixins import IDMixin
+
+if TYPE_CHECKING:
+    from core.models.orders import Order
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -29,8 +33,15 @@ class UserCreate(UserBase):
         return pwd_context.hash(password)
 
 
-class User(IDMixin, UserCreate, ConfirmMixin, table=True):
+class User(UserCreate, ConfirmMixin, table=True):
     __tablename__ = "users"
+
+    id: int | None = Field(
+        default=None,
+        sa_column=Column(BigInteger, primary_key=True),
+    )
+
+    orders: list["Order"] = Relationship(back_populates="lot")
 
 
 class UserPublic(UserBase):

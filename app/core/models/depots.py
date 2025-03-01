@@ -5,6 +5,7 @@ from core.db import BaseSQLModel
 
 class DepotBase(BaseSQLModel):
     name: str
+    region: str
 
 
 class Depot(DepotBase, table=True):

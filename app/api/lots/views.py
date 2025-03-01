@@ -1,10 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 
 from api.auth.depends import SessionDep, UserDep
 from core.models.lots import LotWithPages
 from core.store import store
 
 router = APIRouter(prefix="/lots", tags=["Lots"])
+
+
+@router.post("/upload")
+async def create_upload_file(csv_file: UploadFile) -> dict[str, str]:
+    return {"filename": csv_file.file.read().decode("utf-8")}
 
 
 @router.get(

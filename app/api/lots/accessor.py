@@ -1,6 +1,8 @@
-from sqlmodel import func, select
+from sqlmodel import col, func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from core.models.depots import Depot
+from core.models.fuels import Fuel
 from core.models.lots import Lot
 from core.store import Store
 
@@ -13,21 +15,23 @@ class LotsAccessor:
     async def get_all_lots(
         *,
         session: AsyncSession,
-        page: int | None = 1,
-        offset: int | None = 10,
-        fuel_type: str | None = None,
+        page: int = 1,
+        offset: int = 10,
+        fuel: str | None = None,
         depot: str | None = None,
         region: str | None = None,
-) -> tuple[int, list[Lot]]:
+    ) -> tuple[int, list[Lot]]:
         stmt = (
             select(
                 Lot,
                 func.count().over().label("total_count"),
             )
+            .join(Fuel, col(Fuel.id) == col(Lot.fuel_id))
+            .join(Depot, col(Depot.id) == col(Lot.depot_id))
             .where(
-                (Lot.fuel == fuel_type if fuel_type else True) &
-                (Lot.depot == depot if depot else True) &
-                (Lot.region == region if region else True),
+                (Fuel.name == fuel if fuel else True)
+                & (Depot.name == depot if depot else True)
+                & (Depot.region == region if region else True),
             )
             .offset((page - 1) * offset)
             .limit(offset)
@@ -38,6 +42,10 @@ class LotsAccessor:
         return page_count, [elem[0] for elem in results]
 
     @staticmethod
-    async def get_lot_by_id(lot_id: int, session: AsyncSession) -> Lot:
+    async def get_lot_by_id(lot_id: int, session: AsyncSession) -> Lot | None:
         stmt = select(Lot).where(Lot.id == lot_id)
         return await session.scalar(stmt)
+
+    @staticmethod
+    async def create_lot(lot: Lot, session: AsyncSession) -> Lot:
+        pass

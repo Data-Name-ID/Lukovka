@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 
 from pydantic import BaseModel
-from sqlmodel import BigInteger, Column, Enum, Field, Relationship
+from sqlmodel import BigInteger, Column, Enum, Field
 
 from core.db import BaseSQLModel
 from core.models.depots import DepotPublic

@@ -25,8 +25,7 @@ class FuelsAccessor:
         *,
         fuel_in: FuelPublic,
         session: AsyncSession,
-    ) -> Fuel:
+    ) -> None:
         stmt = insert(Fuel).values(**fuel_in.model_dump()).returning(Fuel)
         await session.scalar(stmt)
         await session.commit()
-        return None

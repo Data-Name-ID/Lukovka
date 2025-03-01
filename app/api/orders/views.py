@@ -1,13 +1,10 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Request
 from starlette import status
 
-from api.auth import errors
-from api.orders import manager
 from api.auth.depends import SessionDep, UserDep
-from core.models.orders import OrderCreate, OrderId
-from core.models.jwt import AccessToken, RefreshToken, TokenCollection
-from core.models.user import UserCreate, UserLogin, UserPublic
+from api.orders import manager
+from core.models.orders import OrderCreate, OrderId, OrderPublic
+from core.models.user import UserPublic
 from core.schemas import DetailScheme
 from core.store import store
 
@@ -29,7 +26,7 @@ async def get_orders(
     region: str | None = None,
     status: str | None = None,
     user_id: int | None = None,
-):
+) -> list[OrderPublic]:
     return await store.order_accessor.get_all_orders(
         user=user,
         session=session,

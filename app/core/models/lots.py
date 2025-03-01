@@ -2,6 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
+from pydantic import BaseModel
 from sqlmodel import BigInteger, Column, Enum, Field, Relationship
 
 from core.db import BaseSQLModel
@@ -50,3 +51,8 @@ class LotPublic(LotBase):
 
     depot: DepotPublic
     fuel: FuelPublic
+
+
+class LotWithPages(BaseModel):
+    page_count: int
+    lots: list[LotPublic]

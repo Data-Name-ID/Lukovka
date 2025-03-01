@@ -20,5 +20,9 @@ class Store:
 
         self.user_manager = UserManager(self)
 
+        from api.lots.accessor import LotsAccessor
+
+        self.lots_accessor = LotsAccessor(self)
+
 
 store = Store()

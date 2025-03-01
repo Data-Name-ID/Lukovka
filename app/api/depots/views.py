@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.auth.depends import AdminDep, SessionDep
+from api.auth.depends import AdminDep, SessionDep, UserDep
 from core.models.depots import (
     DepotNamePublic,
     DepotPublic,
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/depots", tags=["Depots"])
     response_description="Имена нефтебаз",
 )
 async def get_depots_names(
-    _user: AdminDep,
+    _user: UserDep,
     session: SessionDep,
 ) -> list[DepotNamePublic]:
     depots = await store.depons_accessor.get_depots_names(
@@ -32,7 +32,7 @@ async def get_depots_names(
     response_description="Регионы нефтебаз",
 )
 async def get_depots_regions(
-    _user: AdminDep,
+    _user: UserDep,
     session: SessionDep,
 ) -> list[DepotRegionPublic]:
     depots = await store.depons_accessor.get_depots_regions(

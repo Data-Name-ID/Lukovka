@@ -1,11 +1,9 @@
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.orm import load_only
-from sqlmodel import col, exists, select, update
+from sqlmodel import col, exists, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from api.auth.depends import UserDep
 from core.models.orders import Order, OrderCreate, OrderPublic
-from core.models.user import User, UserCreate
+from core.models.user import User
 from core.store import Store
 
 
@@ -16,7 +14,7 @@ class OrderAccessor:
     @staticmethod
     async def get_all_orders(
         *,
-        user: UserDep,
+        user: User,
         session: AsyncSession,
         offset: int = 0,
         page: int = 10,
@@ -47,7 +45,7 @@ class OrderAccessor:
 
     @staticmethod
     async def get_order_by_id(
-        user: UserDep,
+        user: User,
         session: AsyncSession,
         order_id: int,
     ) -> bool | None:

@@ -55,7 +55,11 @@ class LotsAccessor:
 
     @staticmethod
     async def get_lot_by_id(lot_id: int, session: AsyncSession) -> Lot | None:
-        stmt = select(Lot).where(Lot.id == lot_id)
+        stmt = (
+            select(Lot)
+            .where(Lot.id == lot_id)
+            .options(selectinload(Lot.fuel), selectinload(Lot.depot))
+        )
         return await session.scalar(stmt)
 
     @staticmethod

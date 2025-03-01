@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile
 
 from api.auth.depends import SessionDep, UserDep
-from core.models.lots import LotPublic, LotWithPages
+from core.models.lots import LotDetail, LotPublic, LotWithPages
 from core.store import store
 
 router = APIRouter(prefix="/lots", tags=["Lots"])
@@ -57,8 +57,14 @@ async def get_lots_by_id(
     _user: UserDep,
     session: SessionDep,
     lot_id: int,
-) -> LotPublic | None:
-    return await store.lot_accessor.get_lot_by_id(
+) -> LotDetail | None:
+    lot = await store.lot_accessor.get_lot_by_id(
         session=session,
         lot_id=lot_id,
+    )
+    return LotDetail(
+        **lot.model_dump(exclude={"depot", "fuel"}),
+        depot=lot.depot.name,
+        fuel=lot.fuel.name,
+        region=lot.depot.region,
     )

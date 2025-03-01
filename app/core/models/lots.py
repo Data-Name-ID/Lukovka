@@ -51,6 +51,10 @@ class LotPublic(LotBase):
     region: str
 
 
+class LotDetail(LotPublic):
+    date: datetime
+
+
 class LotWithPages(BaseModel):
     page_count: int
     lots: list[LotPublic]

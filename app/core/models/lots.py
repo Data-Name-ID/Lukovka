@@ -15,26 +15,29 @@ class LotStatusEnum(StrEnum):
 
 
 class LotBase(BaseSQLModel):
-    deactivated_at: datetime
+    date: datetime
+    price: float
+
+
+class LotCreate(LotBase):
+    initial_volume: float
     current_volume: float
-    price_per_ton: float
+
+    status: LotStatusEnum = Field(
+        sa_column=Column(Enum(LotStatusEnum, name="lot_status")),
+    )
+
+    depot_id: int = Field(foreign_key="depots.id")
+    fuel_id: int = Field(foreign_key="fuels.id")
 
 
-class Lot(LotBase, table=True):
+class Lot(LotCreate, table=True):
     __tablename__ = "lots"
 
     id: int | None = Field(
         default=None,
         sa_column=Column(BigInteger, primary_key=True),
     )
-
-    initial_volume: float
-    status: LotStatusEnum = Field(
-        sa_column=Column(Enum(LotStatusEnum, name="lot_status")),
-    )
-
-    depot_id: int | None = Field(default=None, foreign_key="depots.id")
-    fuel_id: int | None = Field(default=None, foreign_key="fuels.id")
 
 
 class LotPublic(LotBase):

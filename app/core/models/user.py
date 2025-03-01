@@ -35,6 +35,7 @@ class User(UserCreate, ConfirmMixin, table=True):
         default=None,
         sa_column=Column(BigInteger, primary_key=True),
     )
+    is_admin: bool = False
 
 
 class UserPublic(UserBase):

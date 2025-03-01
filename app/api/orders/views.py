@@ -3,7 +3,9 @@ from fastapi.responses import RedirectResponse
 from starlette import status
 
 from api.auth import errors
+from api.orders import manager
 from api.auth.depends import SessionDep, UserDep
+from core.models.orders import OrderCreate, OrderId
 from core.models.jwt import AccessToken, RefreshToken, TokenCollection
 from core.models.user import UserCreate, UserLogin, UserPublic
 from core.schemas import DetailScheme
@@ -24,6 +26,7 @@ async def get_orders(
     page: int = 10,
     fuel_type: str | None = None,
     depot: str | None = None,
+    region: str | None = None,
 ):
     return await store.order_accessor.get_all_orders(
         session=session,
@@ -31,6 +34,7 @@ async def get_orders(
         page=page,
         fuel_type=fuel_type,
         depot=depot,
+        region=region,
     )
 
 
@@ -55,12 +59,15 @@ async def get_order_by_id(user: UserDep) -> UserPublic:
     response_description="Создание заказа",
 )
 async def order_create(
-    user_in: UserCreate,
+    user: UserDep,
+    order_in: OrderCreate,
     request: Request,
-    background_tasks: BackgroundTasks,
     session: SessionDep,
-) -> None:
-    user_id = await store.order_accessor.create_order(session=session, user_in=user_in)
-    await session.commit()
+) -> OrderId:
+    order_id = manager.process_creating_order(
+        session=session,
+        lot_id=order_in.lot_id,
+        request_quantity=order_in.volume,
+    )
 
-    return None
+    return OrderId(order_id=order_id)

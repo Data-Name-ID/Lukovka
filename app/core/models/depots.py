@@ -1,10 +1,16 @@
-from sqlmodel import BigInteger, Column, Field
+from typing import TYPE_CHECKING
+
+from sqlmodel import BigInteger, Column, Field, Relationship
 
 from core.db import BaseSQLModel
+
+if TYPE_CHECKING:
+    from core.models.lots import Lot
 
 
 class DepotBase(BaseSQLModel):
     name: str
+    region: str
 
 
 class Depot(DepotBase, table=True):
@@ -14,6 +20,8 @@ class Depot(DepotBase, table=True):
         default=None,
         sa_column=Column(BigInteger, primary_key=True),
     )
+
+    lots: list["Lot"] = Relationship(back_populates="depot")
 
 
 class DepotPublic(DepotBase):

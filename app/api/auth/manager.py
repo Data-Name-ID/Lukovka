@@ -47,8 +47,8 @@ class UserManager:
         if not user:
             raise errors.INVALID_TOKEN_ERROR
 
-        if not user.activated:
-            raise errors.UNACTIVATED_USER_ERROR
+        # if not user.activated:
+        #     raise errors.UNACTIVATED_USER_ERROR
 
         return user
 

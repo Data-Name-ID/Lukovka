@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import load_only
-from sqlmodel import col, exists, select, update
+from sqlmodel import col, exists, select, update, true
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.auth.depends import UserDep
@@ -30,10 +30,10 @@ class OrderAccessor:
             select(OrderPublic)
             .where(
                 (user.is_admin | OrderPublic.user.id == user.id)
-                & (OrderPublic.lot.fuel == fuel_type if fuel_type else True)
-                & (OrderPublic.lot.depot == depot if depot else True)
-                & (OrderPublic.lot.region == region if region else True)
-                & (OrderPublic.status == status if status else True)
+                & (OrderPublic.lot.fuel == fuel_type if fuel_type else true())
+                & (OrderPublic.lot.depot == depot if depot else true())
+                & (OrderPublic.lot.region == region if region else true())
+                & (OrderPublic.status == status if status else true())
                 & (
                     OrderPublic.user.id == user_id
                     if user_id and user.is_admin

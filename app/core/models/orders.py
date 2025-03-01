@@ -21,10 +21,6 @@ class OrderStatusEnum(StrEnum):
     CANCELED = "Отменён"
 
 
-class OrderId(BaseModel):
-    order_id: int
-
-
 class OrderBase(BaseSQLModel):
     volume: float
 

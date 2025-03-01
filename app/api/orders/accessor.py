@@ -36,7 +36,7 @@ class OrderAccessor:
         if depot:
             stmt = stmt.where(Order.lot.depot == depot)
         if region:
-            stmt = stmt.where(Order.lot.region == region)
+            stmt = stmt.where(Order.lot.depot.region == region)
         if status:
             stmt = stmt.where(Order.status == status)
         if user_id and user.is_admin:

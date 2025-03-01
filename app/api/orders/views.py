@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from starlette import status
 
 from api.auth.depends import SessionDep, UserDep
-from api.orders import manager
-from core.models.orders import OrderCreate, OrderId, OrderPublic
+from core.models.orders import OrderCreate, OrderPublic
 from core.models.user import UserPublic
 from core.schemas import DetailScheme
 from core.store import store
@@ -51,8 +50,16 @@ async def get_orders(
         },
     },
 )
-async def get_order_by_id(user: UserDep) -> UserPublic:
-    return store.order_accessor.get_order_by_id(user=user)
+async def get_order_by_id(
+    user: UserDep,
+    order_id: int,
+    session: SessionDep,
+) -> UserPublic:
+    return store.order_accessor.get_order_by_id(
+        user=user,
+        order_id=order_id,
+        session=session,
+    )
 
 
 @router.post(
@@ -63,13 +70,11 @@ async def get_order_by_id(user: UserDep) -> UserPublic:
 async def order_create(
     user: UserDep,
     order_in: OrderCreate,
-    request: Request,
     session: SessionDep,
-) -> OrderId:
-    order_id = manager.process_creating_order(
+) -> OrderPublic:
+    return store.order_manager.process_creating_order(
         session=session,
+        user_id=user.id,
         lot_id=order_in.lot_id,
         request_quantity=order_in.volume,
     )
-
-    return OrderId(order_id=order_id)

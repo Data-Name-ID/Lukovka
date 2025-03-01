@@ -38,5 +38,9 @@ class Store:
 
         self.logger = logging.getLogger("lukovka")
 
+        from api.fuels.accessor import FuelsAccessor
+
+        self.fuels_accessor = FuelsAccessor(self)
+
 
 store = Store()

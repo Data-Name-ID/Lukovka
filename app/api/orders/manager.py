@@ -38,6 +38,33 @@ class OrderManager:
         await session.commit()
         return id_
 
+    async def change_status_order(
+            self,
+            *,
+            order_in: OrderUpdate,
+            user: User,
+            session: AsyncSession,
+    ) -> OrderPublic:
+        order = await self.store.order_accessor.get_order_by_id(
+            user=user,
+            order_id=order_in.id,
+            session=session,
+        )
+
+        if not order:
+            raise errors.ORDER_NOT_FOUND
+
+        order.status = order_in.status
+        await session.commit()
+        await session.refresh(order)
+
+        return OrderPublic(
+            **order.model_dump(exclude={"depot", "fuel"}),
+            depot=order.lot.depot.name,
+            fuel=order.lot.fuel.name,
+            region=order.lot.depot.region,
+        )
+
     async def process_canceling_order(
         self,
         *,

@@ -71,8 +71,8 @@ async def get_order_by_id(
 
 
 @router.post(
-    "/",
-    summary="Создание заказа",
+    "",
+    summary="Создание заказ",
     response_description="Создание заказа",
 )
 async def order_create(
@@ -84,6 +84,25 @@ async def order_create(
         session=session,
         user_id=user.id,
         order_in=order_in,
+    )
+
+
+@router.put(
+    "/{order_id}",
+    summary="Изменение статуса заказа",
+    response_description="Изменение статуса заказа",
+)
+async def change_status_order(
+    order_in: OrderUpdate,
+    user: AdminDep,
+    session: SessionDep,
+    order_id: int,
+) -> OrderPublic:
+    return await store.order_manager.change_status_order(
+        session=session,
+        order_id=order_id,
+        order_in=order_in,
+        user=user,
     )
 
 
@@ -120,9 +139,11 @@ async def change_status_order(
     order_in: OrderUpdate,
     user: AdminDep,
     session: SessionDep,
+    order_id,
 ) -> OrderPublic:
     return await store.order_manager.change_status_order(
         session=session,
         order_in=order_in,
+        order_id=order_id,
         user=user,
     )

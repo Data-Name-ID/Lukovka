@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+      "target": "ES5",
+      "module": "ESNext",
+      "jsx": "react",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "moduleResolution": "Node",
+      "resolveJsonModule": true,
+      "outDir": "./dist",
+      "baseUrl": "./src",
+      "paths": {
+      "components": ["components/*"],
+      "config": ["config/*"],
+      "styles": ["styles/*"],
+      "utils": ["utils/*"],
+      "api": ["api/*"],
+      "stores": ["stores/*"]
+    },
+    },
+    "include": ["src", "eslint.config.js"],
+    "exclude": ["node_modules"]
+  }
+  

@@ -1,0 +1,74 @@
+@use 'styles/variables' as *;
+@use 'styles/mixin' as *;
+
+.root {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-height: 18;
+  font-family: 'Roboto';
+
+  &.title {
+    font-weight: $bold;
+    font-size: 44px;
+    line-height: 48px;
+    @include tablet_max {
+      font-size: 30px;
+      line-height: 32px;
+    }
+  }
+  &.button {
+    font-weight: $normal;
+    font-size: 18px;
+  }
+  &.p-20 {
+    font-weight: $normal;
+    font-size: 20px;
+    line-height: 24px;
+    @include tablet_max {
+      font-size: 14px;
+      line-height: 18px;
+    }
+  }
+  &.p-18 {
+    font-weight: $normal;
+    font-size: 18px;
+    line-height: 22px;
+  }
+  &.p-16 {
+    font-weight: $normal;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  &.p-14 {
+    font-weight: $normal;
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  &.normal {
+    font-weight: $normal;
+  }
+
+  &.medium {
+    font-weight: $medium;
+  }
+
+  &.bold {
+    font-weight: $bold;
+  }
+
+  &.primary {
+    color: $primary;
+  }
+
+  &.secondary {
+    color: $secondary;
+  }
+
+  &.accent {
+    color: $accent;
+  }
+}

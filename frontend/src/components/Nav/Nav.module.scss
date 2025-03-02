@@ -1,0 +1,28 @@
+@use 'styles/variables' as *;
+
+.navigation {
+    display: flex;
+    margin: 0;
+    cursor: pointer;
+
+    &__item {
+        padding: 20px;
+        list-style: none;
+        font-weight: 400;
+        transform: translateY(3px);
+
+        a {
+            color: black;
+        }
+
+        &.active {
+            color: $accent;
+            border-bottom: 3px solid;
+            font-weight: 600;
+
+            a {
+                color: $accent;
+            }
+        }
+    }
+}

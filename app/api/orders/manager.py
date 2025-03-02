@@ -1,7 +1,7 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.orders import errors
-from core.models.orders import Order, OrderCreate
+from core.models.orders import OrderCreate
 from core.store import Store
 
 
@@ -15,7 +15,7 @@ class OrderManager:
         user_id: int,
         order_in: OrderCreate,
         session: AsyncSession,
-    ) -> Order:
+    ) -> int:
         lot = await self.store.lot_accessor.get_lot_by_id(
             lot_id=order_in.lot_id, session=session,
         )
@@ -32,5 +32,6 @@ class OrderManager:
             order_in=order_in,
             session=session,
         )
+        id_ = order.id
         await session.commit()
-        return order
+        return id_

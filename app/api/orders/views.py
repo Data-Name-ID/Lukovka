@@ -62,7 +62,7 @@ async def order_create(
     order_in: OrderCreate,
     user: UserDep,
     session: SessionDep,
-) -> OrderPublic:
+) -> int:
     return await store.order_manager.process_creating_order(
         session=session,
         user_id=user.id,

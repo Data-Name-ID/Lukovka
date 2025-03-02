@@ -8,11 +8,14 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    restart: always
 
   frontend:
     build: ./frontend
-    ports:
-      - "80:80"
+    expose:
+      - "80"
+    restart: always
+
 
   postgres-backend:
     image: postgres:16-alpine
@@ -26,10 +29,11 @@ services:
       - POSTGRES_DB=${BACKEND__DB__NAME}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 1s
-      timeout: 3s
-      retries: 5
+      interval: 2s
+      timeout: 5s
+      retries: 10
     command: -p ${BACKEND__DB__PORT}
+    restart: always
 
   nginx:
     image: nginx:stable-alpine
@@ -40,3 +44,4 @@ services:
     depends_on:
       - frontend
       - backend
+    restart: always

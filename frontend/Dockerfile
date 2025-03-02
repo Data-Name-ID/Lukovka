@@ -1,4 +1,4 @@
-FROM node as build
+FROM node AS build
 
 WORKDIR /project
 COPY package.json yarn.lock ./

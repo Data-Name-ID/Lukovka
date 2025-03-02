@@ -1,9 +1,9 @@
-from core.models.orders import OrderCreate, OrderPublic, OrderStatusEnum, OrderUpdate
-from core.models.user import User
-from core.store import Store
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.orders import errors
+from core.models.orders import OrderCreate, OrderPublic, OrderStatusEnum, OrderUpdate
+from core.models.user import User
+from core.store import Store
 
 
 class OrderManager:
@@ -61,12 +61,12 @@ class OrderManager:
         await session.commit()
 
     async def change_status_order(
-            self,
-            *,
-            order_id: int,
-            order_in: OrderUpdate,
-            user: User,
-            session: AsyncSession,
+        self,
+        *,
+        order_id: int,
+        order_in: OrderUpdate,
+        user: User,
+        session: AsyncSession,
     ) -> tuple[OrderPublic, str, str]:
         order = await self.store.order_accessor.get_order_by_id(
             user=user,
@@ -83,12 +83,16 @@ class OrderManager:
         await session.commit()
         await session.refresh(order)
 
-        return OrderPublic(
-            **order.model_dump(exclude={"depot", "fuel"}),
-            depot=order.lot.depot.name,
-            fuel=order.lot.fuel.name,
-            region=order.lot.depot.region,
-        ), old_status, new_status
+        return (
+            OrderPublic(
+                **order.model_dump(exclude={"depot", "fuel"}),
+                depot=order.lot.depot.name,
+                fuel=order.lot.fuel.name,
+                region=order.lot.depot.region,
+            ),
+            old_status,
+            new_status,
+        )
 
     async def send_info_email(
         self,
@@ -104,5 +108,18 @@ class OrderManager:
             template="email_inform_change_status.html",
             old_status=old_status,
             new_status=new_status,
+            order_id=order_id,
+        )
+
+    async def send_create_order_email(
+        self,
+        *,
+        user: User,
+        order_id: int,
+    ) -> None:
+        await self.store.email.send_email(
+            recipient=user.email,
+            title="Создание заказа",
+            template="email_create_order.html",
             order_id=order_id,
         )

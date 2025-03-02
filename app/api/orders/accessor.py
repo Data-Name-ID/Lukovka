@@ -1,13 +1,13 @@
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import selectinload
-from sqlmodel import col, exists, func, select
+from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.orders.filters import OrderFilterParams
 from core.models.depots import Depot
 from core.models.fuels import Fuel
 from core.models.lots import Lot
-from core.models.orders import Order, OrderCreate, OrderPublic
+from core.models.orders import Order, OrderCreate
 from core.models.user import User
 from core.store import Store
 
@@ -78,11 +78,17 @@ class OrderAccessor:
         order_id: int,
         user: User,
         session: AsyncSession,
-    ) -> bool | None:
-        stmt = select(
-            exists().where(col(OrderPublic.id) == order_id)
-            & (user.is_admin | OrderPublic.user.id == user.id),
+    ) -> Order:
+        stmt = (
+            select(Order)
+            .where(Order.id == order_id)
+            .options(
+                selectinload(Order.lot).selectinload(Lot.depot),
+                selectinload(Order.lot).selectinload(Lot.fuel),
+            )
         )
+        if not user.is_admin:
+            stmt = stmt.where(Order.user_id == user.id)
         return await session.scalar(stmt)
 
     @staticmethod

@@ -6,7 +6,6 @@ from starlette import status
 from api.auth.depends import SessionDep, UserDep
 from api.orders.filters import OrderFilterParams
 from core.models.orders import OrderCreate, OrderPublic, OrderWithPages
-from core.models.user import UserPublic
 from core.schemas import DetailScheme
 from core.store import store
 
@@ -57,11 +56,17 @@ async def get_order_by_id(
     order_id: int,
     user: UserDep,
     session: SessionDep,
-) -> UserPublic:
-    return store.order_accessor.get_order_by_id(
+) -> OrderPublic:
+    order = await store.order_accessor.get_order_by_id(
         user=user,
         order_id=order_id,
         session=session,
+    )
+    return OrderPublic(
+        **order.model_dump(exclude={"depot", "fuel"}),
+        depot=order.lot.depot.name,
+        fuel=order.lot.fuel.name,
+        region=order.lot.depot.region,
     )
 
 

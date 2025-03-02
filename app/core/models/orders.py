@@ -35,7 +35,11 @@ class OrderCreate(OrderBase):
 
 class OrderFields(BaseSQLModel):
     status: OrderStatusEnum = Field(
-        sa_column=Column(Enum(OrderStatusEnum, name="status")),
+        default=OrderStatusEnum.IN_PROGRESS,
+        sa_column=Column(
+            Enum(OrderStatusEnum, name="status"),
+            default=OrderStatusEnum.IN_PROGRESS,
+        ),
     )
 
     created_datetime: datetime = Field(

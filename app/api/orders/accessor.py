@@ -4,6 +4,8 @@ from sqlmodel import col, exists, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.orders.filters import OrderFilterParams
+from core.models.depots import Depot
+from core.models.fuels import Fuel
 from core.models.lots import Lot
 from core.models.orders import Order, OrderCreate, OrderPublic
 from core.models.user import User
@@ -22,9 +24,9 @@ class OrderAccessor:
         session: AsyncSession,
     ) -> list[Order]:
         mapping = {
-            "fuel_type": Order.lot.fuel,
-            "depot": Order.lot.depot,
-            "region": Order.lot.depot.region,
+            "fuel": Fuel.name,
+            "depot": Depot.name,
+            "region": Depot.region,
             "status": Order.status,
         }
 

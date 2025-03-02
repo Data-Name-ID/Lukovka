@@ -42,7 +42,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - static_volume:/project/static
+      - static_data:/var/www/static
 
     depends_on:
       # - frontend

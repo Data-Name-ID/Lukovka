@@ -12,11 +12,11 @@ services:
     volumes:
       - static_volume:/project/static
 
-  # frontend:
-  #   build: ./frontend
-  #   expose:
-  #     - "80"
-  #   restart: always
+  frontend:
+    build: ./frontend
+    expose:
+      - "80"
+    restart: always
 
   postgres-backend:
     image: postgres:16-alpine
@@ -45,7 +45,7 @@ services:
       - static_volume:/var/www/static
 
     depends_on:
-      # - frontend
+      - frontend
       - backend
     restart: always
 

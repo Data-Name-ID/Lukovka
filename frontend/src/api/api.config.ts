@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://where-pizza.ru/api',
+  baseURL: 'https://where-pizza.ru/api',
 });
 
 // Перехватчик запросов

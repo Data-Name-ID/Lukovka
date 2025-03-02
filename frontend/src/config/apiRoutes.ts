@@ -1,4 +1,4 @@
-const API_BASE = 'http://where-pizza.ru/api';
+const API_BASE = 'https://where-pizza.ru/api';
 const createApiRoute = (route: string) => `${API_BASE}${route}`;
 
 export const apiRoutes = {

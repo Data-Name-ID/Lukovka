@@ -13,7 +13,7 @@ router = APIRouter(prefix="/orders", tags=["Заказы"])
 
 
 @router.get(
-    "/",
+    "",
     summary="Заказы",
     response_description="Заказы пользователя",
 )
@@ -71,7 +71,7 @@ async def get_order_by_id(
 
 
 @router.post(
-    "/",
+    "",
     summary="Создание заказ",
     response_description="Создание заказа",
 )

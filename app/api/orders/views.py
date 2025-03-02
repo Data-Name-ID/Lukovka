@@ -128,22 +128,3 @@ async def order_cancel(
         order_id=order_id,
     )
     return MessageScheme(message="Заказ успешно отменен")
-
-
-@router.put(
-    "/{order_id}",
-    summary="Изменение статуса заказа",
-    response_description="Изменение статуса заказа",
-)
-async def change_status_order(
-    order_in: OrderUpdate,
-    user: AdminDep,
-    session: SessionDep,
-    order_id,
-) -> OrderPublic:
-    return await store.order_manager.change_status_order(
-        session=session,
-        order_in=order_in,
-        order_id=order_id,
-        user=user,
-    )

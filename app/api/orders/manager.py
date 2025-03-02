@@ -90,13 +90,14 @@ class OrderManager:
     async def change_status_order(
             self,
             *,
+            order_id: int,
             order_in: OrderUpdate,
             user: User,
             session: AsyncSession,
     ) -> OrderPublic:
         order = await self.store.order_accessor.get_order_by_id(
             user=user,
-            order_id=order_in.id,
+            order_id=order_id,
             session=session,
         )
 

@@ -34,7 +34,6 @@ class OrderCreate(OrderBase):
 
 
 class OrderUpdate(BaseModel):
-    id: int
     status: OrderStatusEnum
 
 

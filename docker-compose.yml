@@ -1,6 +1,6 @@
 services:
   backend:
-    build: .
+    build: ./backend
     ports:
       - ${BACKEND__RUN__PORT}:${BACKEND__RUN__PORT}
     depends_on:

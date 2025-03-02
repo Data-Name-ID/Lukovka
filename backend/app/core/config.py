@@ -60,7 +60,10 @@ class MailSettings(BaseModel):
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(BASE_DIR.parent / ".env.template", BASE_DIR.parent / ".env"),
+        env_file=(
+            BASE_DIR.parent.parent / ".env.template",
+            BASE_DIR.parent.parent / ".env",
+        ),
         case_sensitive=False,
         env_prefix="BACKEND__",
         env_nested_delimiter="__",

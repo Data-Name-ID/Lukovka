@@ -33,7 +33,7 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.ruff]
-src = ["app"]
+src = ["backend/app"]
 target-version = "py312"
 
 [tool.ruff.lint]

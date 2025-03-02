@@ -87,8 +87,8 @@ async def order_create(
     )
 
 
-@router.put(
-    "/{order_id}",
+@router.patch(
+    "/{order_id}/status",
     summary="Изменение статуса заказа",
     response_description="Изменение статуса заказа",
 )
@@ -106,8 +106,8 @@ async def change_status_order(
     )
 
 
-@router.post(
-    "/{order_id}",
+@router.patch(
+    "/{order_id}/cancel",
     summary="Отмена заказа",
     response_description="Отмена заказа",
     responses={

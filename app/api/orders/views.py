@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query
 from starlette import status
 
 from api.auth.depends import AdminDep, SessionDep, UserDep
+from api.orders import errors
 from api.orders.filters import OrderFilterParams
 from core.models.orders import OrderCreate, OrderPublic, OrderUpdate, OrderWithPages
 from core.schemas import DetailScheme, MessageScheme
@@ -62,6 +63,10 @@ async def get_order_by_id(
         order_id=order_id,
         session=session,
     )
+
+    if order is None:
+        raise errors.ORDER_NOT_FOUND
+
     return OrderPublic(
         **order.model_dump(exclude={"depot", "fuel"}),
         depot=order.lot.depot.name,

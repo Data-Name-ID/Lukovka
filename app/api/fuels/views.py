@@ -16,14 +16,13 @@ async def get_fuels_names(
     _user: UserDep,
     session: SessionDep,
 ) -> list[FuelPublic]:
-    fuels = await store.fuels_accessor.get_fuels_names(
+    return await store.fuels_accessor.get_fuels_names(
         session=session,
     )
-    return fuels
 
 
 @router.post(
-    "/",
+    "",
     summary="Добавление топлива",
     response_description="Добавление топлива",
 )

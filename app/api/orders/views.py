@@ -3,17 +3,17 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from starlette import status
 
-from api.auth.depends import SessionDep, UserDep
+from api.auth.depends import AdminDep, SessionDep, UserDep
 from api.orders.filters import OrderFilterParams
-from core.models.orders import OrderCreate, OrderPublic, OrderWithPages
-from core.schemas import DetailScheme
+from core.models.orders import OrderCreate, OrderPublic, OrderUpdate, OrderWithPages
+from core.schemas import DetailScheme, MessageScheme
 from core.store import store
 
 router = APIRouter(prefix="/orders", tags=["Заказы"])
 
 
 @router.get(
-    "/",
+    "",
     summary="Заказы",
     response_description="Заказы пользователя",
 )
@@ -72,7 +72,7 @@ async def get_order_by_id(
 
 @router.post(
     "/",
-    summary="Создание заказ",
+    summary="Создание заказа",
     response_description="Создание заказа",
 )
 async def order_create(
@@ -84,4 +84,45 @@ async def order_create(
         session=session,
         user_id=user.id,
         order_in=order_in,
+    )
+
+
+@router.post(
+    "/{order_id}",
+    summary="Отмена заказа",
+    response_description="Отмена заказа",
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "description": "Заказ с id {order_id} не найден",
+            "model": DetailScheme,
+        },
+    },
+)
+async def order_cancel(
+    order_id: int,
+    user: UserDep,
+    session: SessionDep,
+) -> MessageScheme:
+    await store.order_manager.process_canceling_order(
+        session=session,
+        user=user,
+        order_id=order_id,
+    )
+    return MessageScheme(message="Заказ успешно отменен")
+
+
+@router.put(
+    "/{order_id}",
+    summary="Изменение статуса заказа",
+    response_description="Изменение статуса заказа",
+)
+async def change_status_order(
+    order_in: OrderUpdate,
+    user: AdminDep,
+    session: SessionDep,
+) -> OrderPublic:
+    return await store.order_manager.change_status_order(
+        session=session,
+        order_in=order_in,
+        user=user,
     )

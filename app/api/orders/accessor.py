@@ -78,7 +78,7 @@ class OrderAccessor:
         order_id: int,
         user: User,
         session: AsyncSession,
-    ) -> Order:
+    ) -> Order | None:
         stmt = (
             select(Order)
             .where(Order.id == order_id)

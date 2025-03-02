@@ -40,7 +40,7 @@ async def get_depots_regions(
 
 
 @router.post(
-    "/",
+    "",
     summary="Добавление нефтебазы",
     response_description="Добавление нефтебазы",
 )

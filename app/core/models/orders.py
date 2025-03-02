@@ -5,8 +5,8 @@ from pydantic import BaseModel
 from sqlmodel import TIMESTAMP, BigInteger, Column, Enum, Field, Relationship, text
 
 from core.db import BaseSQLModel
-from core.models.lots import Lot, LotPublic
-from core.models.user import User, UserPublic
+from core.models.lots import Lot
+from core.models.user import User
 
 
 class DeliveryTypeEnum(StrEnum):
@@ -76,5 +76,12 @@ class Order(OrderCreate, OrderFields, table=True):
 class OrderPublic(OrderBase, OrderFields):
     id: int
 
-    lot: LotPublic
-    user: UserPublic
+    depot: str
+    fuel: str
+    region: str
+    user_id: int
+
+
+class OrderWithPages(BaseModel):
+    page_count: int
+    orders: list[OrderPublic]

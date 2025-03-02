@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import selectinload
-from sqlmodel import col, exists, select
+from sqlmodel import col, exists, func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from api.orders.filters import OrderFilterParams
@@ -22,7 +22,7 @@ class OrderAccessor:
         filter_query: OrderFilterParams,
         user: User,
         session: AsyncSession,
-    ) -> list[Order]:
+    ) -> tuple[int, list[Order]]:
         mapping = {
             "fuel": Fuel.name,
             "depot": Depot.name,
@@ -34,22 +34,40 @@ class OrderAccessor:
             self.store.core_accessor.make_condition(getattr(filter_query, key), column)
             for key, column in mapping.items()
         ]
-        conditions = [cond for cond in conditions if cond]
+        conditions = [cond for cond in conditions if cond is not None]
 
         if not user.is_admin:
             conditions.append(Order.user_id == user.id)
         elif getattr(filter_query, "user_id", None):
             conditions.append(Order.user_id == filter_query.user_id)
 
-        stmt = (
-            select(Order)
+        query = (
+            select(Order, func.count(Order.id).over().label("total_count"))
             .join(Lot, Order.lot_id == Lot.id)
+            .join(Fuel, Fuel.id == Lot.fuel_id)
+            .join(Depot, Depot.id == Lot.depot_id)
             .options(selectinload(Order.lot))
             .where(*conditions)
             .offset((filter_query.page - 1) * filter_query.offset)
             .limit(filter_query.offset)
         )
-        return (await session.scalars(stmt)).all()
+
+        result = await session.exec(query)
+        rows = result.all()
+
+        if rows:
+            total_count = rows[0][1]
+            data = [row[0] for row in rows]
+        else:
+            total_count = 0
+            data = []
+
+        page_count = (
+            (total_count + filter_query.offset - 1) // filter_query.offset
+            if filter_query.offset
+            else 0
+        )
+        return page_count, data
 
     @staticmethod
     async def get_order_by_id(

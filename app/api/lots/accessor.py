@@ -49,7 +49,7 @@ class LotsAccessor:
             .limit(filter_query.offset)
         )
 
-        result = await session.execute(query)
+        result = await session.exec(query)
         rows = result.all()
 
         if rows:

@@ -5,7 +5,7 @@ from starlette import status
 
 from api.auth.depends import SessionDep, UserDep
 from api.orders.filters import OrderFilterParams
-from core.models.orders import OrderCreate, OrderPublic
+from core.models.orders import OrderCreate, OrderPublic, OrderWithPages
 from core.models.user import UserPublic
 from core.schemas import DetailScheme
 from core.store import store
@@ -22,11 +22,23 @@ async def get_orders(
     filter_query: Annotated[OrderFilterParams, Query()],
     user: UserDep,
     session: SessionDep,
-) -> list[OrderPublic]:
-    return await store.order_accessor.get_orders(
+) -> OrderWithPages:
+    page_count, orders = await store.order_accessor.get_orders(
         filter_query=filter_query,
         user=user,
         session=session,
+    )
+    return OrderWithPages(
+        page_count=page_count,
+        orders=[
+            OrderPublic(
+                **order.model_dump(exclude={"depot", "fuel"}),
+                depot=order.lot.depot.name,
+                fuel=order.lot.fuel.name,
+                region=order.lot.depot.region,
+            )
+            for order in orders
+        ],
     )
 
 

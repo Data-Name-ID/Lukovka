@@ -26,6 +26,7 @@ export interface LoginResponse {
 export interface CurrentUserResponse {
   id: number;
   email: string;
+  is_admin: boolean;
 }
 
 export default class AuthService {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, FC } from 'react';
 import { apiRoutes } from 'config/apiRoutes';
+import AuthStore from 'stores/AuthStore';
 
 interface FuelType {
   id: number;
@@ -33,9 +34,17 @@ const FuelTypesFilter: FC<FuelTypesFilterProps> = ({ onFuelSelect }) => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
+
+        // Если сервер вернул 401, вызываем logout и редиректим на /login
         if (!response.ok) {
+          if (response.status === 401) {
+            AuthStore.logout();
+            window.location.href = '/login';
+            return;
+          }
           throw new Error('Ошибка при получении типов топлива');
         }
+
         const data: FuelType[] = await response.json();
         setFuelTypes(data);
       } catch (error) {

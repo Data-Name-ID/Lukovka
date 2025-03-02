@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthStore from 'stores/AuthStore';
 
 const ProfilePage = observer(() => {
   useEffect(() => {
     AuthStore.getCurrentUser();
-    console.log(AuthStore.user);
   }, []);
 
   const handleLogout = () => {
@@ -42,12 +42,17 @@ const ProfilePage = observer(() => {
               </tbody>
             </table>
             <div className="d-flex gap-2">
-              <a className="btn btn-primary" href="/orders">
-                Мои заказы
-              </a>
+              <Link to="/orders">
+                <button className="btn btn-primary">Мои заказы</button>
+              </Link>
               <button className="btn btn-outline-success" type="button" onClick={handleLogout}>
                 Выход
               </button>
+              {AuthStore.user?.is_admin && (
+                <Link to="/load_lot">
+                  <button className="btn btn-primary">Загрузить лот</button>
+                </Link>
+              )}
             </div>
           </div>
           <img

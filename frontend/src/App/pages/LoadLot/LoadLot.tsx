@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from 'components/Button';
 import { apiRoutes } from 'config/apiRoutes';
+import AuthStore from 'stores/AuthStore';
 
 const LoadLot = () => {
   // Состояние для хранения выбранного файла
@@ -8,6 +10,13 @@ const LoadLot = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!AuthStore.user?.is_admin) {
+      navigate('/lots');
+    }
+  }, [navigate]);
 
   // Обработчик изменения файла
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

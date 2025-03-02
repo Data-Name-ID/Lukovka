@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Button from 'components/Button';
 import Loader from 'components/Loader';
 import Text from 'components/Text';
+import { apiRoutes } from 'config/apiRoutes';
 import DetailStore from '../DetailPage/stores/DetailStore';
 
 const MakeOrderPage = () => {
@@ -55,7 +56,7 @@ const MakeOrderPage = () => {
     console.log('Отправляем данные:', orderData);
 
     try {
-      const response = await fetch('http://localhost:8000/api/orders/', {
+      const response = await fetch(apiRoutes.orders, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

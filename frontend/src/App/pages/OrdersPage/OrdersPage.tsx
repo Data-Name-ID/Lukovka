@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Loader from 'components/Loader';
+import { apiRoutes } from 'config/apiRoutes';
 
 interface Order {
   id: number;
@@ -26,7 +27,7 @@ const OrdersPage = () => {
       const accessToken = localStorage.getItem('access_token') || '';
 
       try {
-        const response = await fetch('http://localhost:8000/api/orders', {
+        const response = await fetch(apiRoutes.orders, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -4,6 +4,7 @@ import AuthService, { RegisterPayload, LoginPayload } from 'api/AuthService';
 export interface User {
   id: number;
   email: string;
+  is_admin: boolean;
 }
 
 class AuthStore {
@@ -61,6 +62,7 @@ class AuthStore {
       this.user = {
         id: data.id,
         email: data.email,
+        is_admin: data.is_admin,
       };
     } catch (err) {
       console.error('Get user error:', err);

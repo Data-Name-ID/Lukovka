@@ -33,6 +33,11 @@ class OrderCreate(OrderBase):
     lot_id: int | None = Field(default=None, foreign_key="lots.id")
 
 
+class OrderUpdate(BaseModel):
+    id: int
+    status: OrderStatusEnum
+
+
 class OrderFields(BaseSQLModel):
     status: OrderStatusEnum = Field(
         default=OrderStatusEnum.IN_PROGRESS,

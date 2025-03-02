@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from starlette import status
 
-from api.auth.depends import SessionDep, UserDep
+from api.auth.depends import AdminDep, SessionDep, UserDep
 from api.orders.filters import OrderFilterParams
-from core.models.orders import OrderCreate, OrderPublic, OrderWithPages
+from core.models.orders import OrderCreate, OrderPublic, OrderUpdate, OrderWithPages
 from core.schemas import DetailScheme
 from core.store import store
 
@@ -84,4 +84,21 @@ async def order_create(
         session=session,
         user_id=user.id,
         order_in=order_in,
+    )
+
+
+@router.put(
+    "/{order_id}",
+    summary="Изменение статуса заказа",
+    response_description="Изменение статуса заказа",
+)
+async def change_status_order(
+    order_in: OrderUpdate,
+    user: AdminDep,
+    session: SessionDep,
+) -> OrderPublic:
+    return await store.order_manager.change_status_order(
+        session=session,
+        order_in=order_in,
+        user=user,
     )

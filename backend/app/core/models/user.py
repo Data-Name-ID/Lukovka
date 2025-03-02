@@ -47,6 +47,7 @@ class User(UserCreate, ConfirmMixin, table=True):
 
 class UserPublic(UserBase):
     id: int
+    is_admin: bool = False
 
 
 class UserLogin(BaseModel):

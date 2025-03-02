@@ -1,0 +1,11 @@
+.panel {
+    &__button {
+        appearance: none;
+        background-color: transparent;
+        padding: 0;
+        outline: none;
+        border: none;
+        margin-left: 16px;
+        cursor: pointer;
+    }
+}

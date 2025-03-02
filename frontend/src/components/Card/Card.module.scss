@@ -1,0 +1,52 @@
+.card {
+    transition: box-shadow 0.3s;
+    width: 380px;
+
+    &:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    &__image {
+        width: 380px;
+        height: 380px;
+        object-fit: cover;
+        background-color: #d9d9d9;
+    }
+
+    &__content {
+        padding: 24px 12px;
+        background-color: white;
+    }
+
+    &__caption {
+        margin-bottom: 8px;
+    }
+
+    &__title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    &__subtitle {
+        color: #AFADB5;
+        margin-top: 8px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 18px;
+    }
+
+    &__action {
+        margin-left: auto;
+    }
+}

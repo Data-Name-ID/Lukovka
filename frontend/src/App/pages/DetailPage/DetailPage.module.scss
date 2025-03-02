@@ -1,0 +1,59 @@
+@use 'styles/variables' as *;
+@use 'styles/mixin' as *;
+
+.item {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 26px;
+
+
+    &__images {
+        margin-right: 40px ;
+    } 
+
+    @include tablet_max {
+        grid-template-columns: 1fr; // Один столбец
+        gap: 15px; // Уменьшение расстояния между элементами
+
+        &__images {
+            margin-right: 0; // Убираем отступ справа, так как больше не нужно
+        }
+    }
+}
+
+.related__items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+    margin-top: 40px;
+    margin-bottom: 100px;
+}
+
+.subtitle {
+    font-size: 32px !important;
+    margin-top: 60px;
+}
+
+
+.nav_detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav_detail svg {
+    flex-shrink: 0;
+}
+
+.nav_detail__text {
+    display: flex;
+    align-items: center;
+    line-height: 1; /* Убирает лишний отступ снизу */
+    padding: 0; /* Дополнительно убираем возможные отступы */
+    margin: 0;
+}

@@ -1,0 +1,17 @@
+@use './styles/Roboto/fonts.scss';
+@use './styles/reset.scss';
+
+body {
+    margin: 0px;
+    background-color: #FAFAFA;
+    font-family: 'Roboto';
+}
+
+.container {
+    width: 100%;
+    max-width: 1270px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: 0 auto;
+}
+

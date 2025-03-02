@@ -1,0 +1,24 @@
+@use 'styles/variables' as *;
+
+.content {
+    height: 52px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 10px;
+    border: 1px solid black;
+}
+
+.input {
+    background: #ffffff;
+    width: 100%;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    padding-left: 10px;
+}
+
+.focus {
+    border: 1px solid $accent !important;
+}

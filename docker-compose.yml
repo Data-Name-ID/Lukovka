@@ -16,7 +16,6 @@ services:
       - "80"
     restart: always
 
-
   postgres-backend:
     image: postgres:16-alpine
     ports:

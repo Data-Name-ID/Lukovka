@@ -46,13 +46,16 @@ class OrderAccessor:
             .join(Lot, Order.lot_id == Lot.id)
             .join(Fuel, Fuel.id == Lot.fuel_id)
             .join(Depot, Depot.id == Lot.depot_id)
-            .options(selectinload(Order.lot))
+            .options(
+                selectinload(Order.lot).selectinload(Lot.depot),
+                selectinload(Order.lot).selectinload(Lot.fuel),
+            )
             .where(*conditions)
             .offset((filter_query.page - 1) * filter_query.offset)
             .limit(filter_query.offset)
         )
 
-        result = await session.exec(query)
+        result = await session.execute(query)
         rows = result.all()
 
         if rows:

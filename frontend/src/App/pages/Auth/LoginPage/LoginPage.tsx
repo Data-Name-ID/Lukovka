@@ -56,21 +56,20 @@ const LoginPage = observer(() => {
             <Form.Label>Email address</Form.Label>
             <Form.Control
               type="email"
-              placeholder="Enter email"
+              placeholder="Введите email"
               value={email}
               onChange={(e) => {
                 setError('');
                 setEmail(e.target.value);
               }}
             />
-            <Form.Text className="text-muted">Well never share your email with anyone else.</Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>Пароль</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Password"
+              placeholder="Введите пароль"
               value={password}
               onChange={(e) => {
                 setError('');

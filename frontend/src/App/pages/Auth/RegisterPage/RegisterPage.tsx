@@ -25,7 +25,7 @@ const RegisterPage = observer(() => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match!');
+      setError('Пароли не совпадают!');
       return;
     }
 
@@ -47,7 +47,7 @@ const RegisterPage = observer(() => {
             <Form.Label>Email address</Form.Label>
             <Form.Control
               type="email"
-              placeholder="Enter email"
+              placeholder="Введите email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -58,7 +58,7 @@ const RegisterPage = observer(() => {
             <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Password"
+              placeholder="Введите пароль"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -68,7 +68,7 @@ const RegisterPage = observer(() => {
             <Form.Label>Confirm password</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Confirm password"
+              placeholder="Подтвердите пароль"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />

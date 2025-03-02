@@ -82,14 +82,23 @@ async def get_order_by_id(
 )
 async def order_create(
     order_in: OrderCreate,
+    background_tasks: BackgroundTasks,
     user: UserDep,
     session: SessionDep,
 ) -> int:
-    return await store.order_manager.process_creating_order(
+    order_id = await store.order_manager.process_creating_order(
         session=session,
         user_id=user.id,
         order_in=order_in,
     )
+
+    background_tasks.add_task(
+        store.order_manager.send_create_order_email,
+        user=user,
+        order_id=order_id,
+    )
+
+    return order_id
 
 
 @router.patch(

@@ -1,13 +1,13 @@
-from core.models.jwt import AccessToken, RefreshToken, TokenCollection
-from core.models.user import UserCreate, UserLogin, UserPublic
-from core.schemas import DetailScheme
-from core.store import store
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from starlette import status
 
 from api.auth import errors
 from api.auth.depends import SessionDep, UserDep
+from core.models.jwt import AccessToken, RefreshToken, TokenCollection
+from core.models.user import UserCreate, UserLogin, UserPublic
+from core.schemas import DetailScheme
+from core.store import store
 
 router = APIRouter(prefix="/auth", tags=["Аутентификация"])
 

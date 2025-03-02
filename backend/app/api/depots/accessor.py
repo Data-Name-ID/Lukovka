@@ -39,20 +39,3 @@ class DepotsAccessor:
         await session.scalar(stmt)
         await session.commit()
         return None
-
-    # @staticmethod
-    # async def get_lot_by_id(lot_id: int, session: AsyncSession) -> Lot | None:
-    #     stmt = (
-    #         select(Lot)
-    #         .where(Lot.id == lot_id)
-    #         .options(selectinload(Lot.fuel), selectinload(Lot.depot))
-    #     )
-    #     return await session.scalar(stmt)
-
-    # @staticmethod
-    # async def create_lots(
-    #     lots: list[dict[str, Any], None, None],
-    #     session: AsyncSession,
-    # ) -> Lot | None:
-    #     stmt = insert(Lot).values(lots).returning(Lot)
-    #     return await session.exec(stmt)

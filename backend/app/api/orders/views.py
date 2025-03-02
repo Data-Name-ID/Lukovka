@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, BackgroundTasks, Query
 from starlette import status
 
 from api.auth.depends import AdminDep, SessionDep, UserDep
@@ -101,14 +101,25 @@ async def change_status_order(
     order_in: OrderUpdate,
     user: AdminDep,
     session: SessionDep,
+    background_tasks: BackgroundTasks,
     order_id: int,
 ) -> OrderPublic:
-    return await store.order_manager.change_status_order(
+    res, old_status, new_status = await store.order_manager.change_status_order(
         session=session,
         order_id=order_id,
         order_in=order_in,
         user=user,
     )
+
+    background_tasks.add_task(
+        store.order_manager.send_info_email,
+        user=user,
+        old_status=old_status,
+        new_status=new_status,
+        order_id=order_id,
+    )
+
+    return res
 
 
 @router.patch(

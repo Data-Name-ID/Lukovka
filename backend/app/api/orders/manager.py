@@ -1,9 +1,9 @@
-from sqlmodel.ext.asyncio.session import AsyncSession
-
-from api.orders import errors
 from core.models.orders import OrderCreate, OrderPublic, OrderStatusEnum, OrderUpdate
 from core.models.user import User
 from core.store import Store
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+from api.orders import errors
 
 
 class OrderManager:
@@ -38,33 +38,6 @@ class OrderManager:
         await session.commit()
         return id_
 
-    async def change_status_order(
-            self,
-            *,
-            order_in: OrderUpdate,
-            user: User,
-            session: AsyncSession,
-    ) -> OrderPublic:
-        order = await self.store.order_accessor.get_order_by_id(
-            user=user,
-            order_id=order_in.id,
-            session=session,
-        )
-
-        if not order:
-            raise errors.ORDER_NOT_FOUND
-
-        order.status = order_in.status
-        await session.commit()
-        await session.refresh(order)
-
-        return OrderPublic(
-            **order.model_dump(exclude={"depot", "fuel"}),
-            depot=order.lot.depot.name,
-            fuel=order.lot.fuel.name,
-            region=order.lot.depot.region,
-        )
-
     async def process_canceling_order(
         self,
         *,
@@ -94,7 +67,7 @@ class OrderManager:
             order_in: OrderUpdate,
             user: User,
             session: AsyncSession,
-    ) -> OrderPublic:
+    ) -> tuple[OrderPublic, str, str]:
         order = await self.store.order_accessor.get_order_by_id(
             user=user,
             order_id=order_id,
@@ -104,7 +77,9 @@ class OrderManager:
         if not order:
             raise errors.ORDER_NOT_FOUND
 
+        old_status = order.status
         order.status = order_in.status
+        new_status = order_in.status
         await session.commit()
         await session.refresh(order)
 
@@ -113,4 +88,21 @@ class OrderManager:
             depot=order.lot.depot.name,
             fuel=order.lot.fuel.name,
             region=order.lot.depot.region,
+        ), old_status, new_status
+
+    async def send_info_email(
+        self,
+        *,
+        user: User,
+        old_status: str,
+        new_status: str,
+        order_id: int,
+    ) -> None:
+        await self.store.email.send_email(
+            recipient=user.email,
+            title="Изменение статуса заказа",
+            template="email_inform_change_status.html",
+            old_status=old_status,
+            new_status=new_status,
+            order_id=order_id,
         )
